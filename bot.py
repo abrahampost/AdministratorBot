@@ -17,7 +17,7 @@ async def nick(ctx, *args):
 		await client.say("Error: proper command usage is '$nick <user> <nickname>'")
 		return
 	
-	#get relevant info from the context
+	#get relevant info from the context of the message
 	server = ctx.message.server
 	mentions = ctx.message.mentions
 	
@@ -32,6 +32,7 @@ async def nick(ctx, *args):
 		await client.say("Error: Unable to change own nickname")
 		return
 		
+	#Don't let the bot change his own nickname
 	if member_to_change == client.user:
 		await client.say("Error: Please don't try and change my nickname")
 		return
@@ -45,11 +46,13 @@ async def nick(ctx, *args):
 	try:
 		await client.change_nickname(member_to_change, nickname)
 	except Exception as e:
+		#if it fails somehow, fail gracefully
 		await client.say("Unable to change nickname")
 		print(e)
 	else:
+		#if it doesn't catch any erros
 		await client.say("Successfully changed nickname")
 	
 with open ("token.txt", "r") as file:
 	token = file.read()
-	client.run(token)
+client.run(token)
