@@ -5,6 +5,7 @@ from discord.ext import commands
 import platform
 import requests
 import random
+import markovify
 
 client = Bot(description="Administrative bot", command_prefix="$")
 
@@ -69,6 +70,22 @@ async def slay(ctx):
 	#Connect the two and send it
 	final_insult = "<@!{}> is {}".format(random_member.id, insult)
 	await client.say(final_insult)
+	
+@client.command(pass_context=True)
+async def flavortown(ctx):
+	text = ""
+	#make a big list of messages
+	async for message in client.logs_from(ctx.message.channel, limit=400):
+		#if message.author != client.user:
+		text += message.content
+		text += " \n"
+	#build the model
+	model = markovify.NewlineText(text)
+	#say some stuff
+	for i in range(5):
+		response = model.make_sentence(test_output=False)
+		if response:
+			await client.say(response)
 
 def get_random(members):
 	rand_index = random.randint(0, len(members))
