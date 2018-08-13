@@ -3,6 +3,8 @@ import asyncio
 from discord.ext.commands import Bot
 from discord.ext import commands
 import platform
+import requests
+import random
 
 client = Bot(description="Administrative bot", command_prefix="$")
 
@@ -52,6 +54,30 @@ async def nick(ctx, *args):
 	else:
 		#if it doesn't catch any erros
 		await client.say("Successfully changed nickname")
+
+@client.command(pass_context=True)
+async def slay(ctx):
+	#get a random member from the server
+	server = ctx.message.server
+	members = server.members
+	random_member = get_random(members)
+	
+	#get a random insult and change its format to mention someone
+	insult = requests.get("https://insult.mattbas.org/api/insult")
+	insult = insult.text[8:]
+	
+	#Connect the two and send it
+	final_insult = "<@!{}> is {}".format(random_member.id, insult)
+	await client.say(final_insult)
+
+def get_random(members):
+	rand_index = random.randint(0, len(members))
+	i = 0
+	for member in members:
+		if i != rand_index:
+			i += 1
+		else:
+			return member
 	
 with open ("token.txt", "r") as file:
 	token = file.read()
